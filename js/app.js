@@ -228,78 +228,81 @@ class NewsletterApp {
         const displayPhotos = this.photos.slice(0, 12);
 
         let html = `
-            <div style="
-                width: 210mm;
-                height: 297mm;
-                margin: 0 auto;
-                padding: 20mm;
-                background: ${template.colors.background};
-                border: 2px solid ${template.colors.primary};
-                box-sizing: border-box;
-                font-family: 'Yu Gothic', 'Meiryo', sans-serif;
-            ">
-                <!-- ヘッダー -->
+            <div class="preview-wrapper">
                 <div style="
-                    text-align: center;
-                    margin-bottom: 10mm;
-                    padding: 10mm;
-                    background: linear-gradient(135deg, ${template.colors.primary} 0%, ${template.colors.secondary} 100%);
-                    color: white;
-                    border-radius: 10px;
+                    width: 210mm;
+                    height: 297mm;
+                    margin: 0 auto;
+                    padding: 20mm;
+                    background: ${template.colors.background};
+                    border: 2px solid ${template.colors.primary};
+                    box-sizing: border-box;
+                    font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+                    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
                 ">
-                    <h1 style="
-                        font-size: 32pt;
-                        margin: 0 0 5mm 0;
-                        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-                    ">${template.decorations[0]} ${eventTitle} ${template.decorations[0]}</h1>
-                    ${dateStr ? `<p style="font-size: 18pt; margin: 0;">${dateStr}</p>` : ''}
-                </div>
-
-                <!-- 写真グリッド -->
-                <div style="
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 5mm;
-                    margin-bottom: 10mm;
-                ">
-                    ${displayPhotos.map(photo => `
-                        <div style="
-                            aspect-ratio: 1;
-                            overflow: hidden;
-                            border-radius: 8px;
-                            border: 3px solid ${template.colors.primary};
-                        ">
-                            <img src="${photo.data}" style="
-                                width: 100%;
-                                height: 100%;
-                                object-fit: cover;
-                            ">
-                        </div>
-                    `).join('')}
-                </div>
-
-                <!-- コメント -->
-                ${comment ? `
+                    <!-- ヘッダー -->
                     <div style="
-                        padding: 8mm;
-                        background: white;
-                        border: 3px solid ${template.colors.secondary};
+                        text-align: center;
+                        margin-bottom: 10mm;
+                        padding: 10mm;
+                        background: linear-gradient(135deg, ${template.colors.primary} 0%, ${template.colors.secondary} 100%);
+                        color: white;
                         border-radius: 10px;
-                        font-size: 14pt;
-                        line-height: 1.8;
-                        white-space: pre-wrap;
                     ">
-                        ${comment}
+                        <h1 style="
+                            font-size: 32pt;
+                            margin: 0 0 5mm 0;
+                            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                        ">${template.decorations[0]} ${eventTitle} ${template.decorations[0]}</h1>
+                        ${dateStr ? `<p style="font-size: 18pt; margin: 0;">${dateStr}</p>` : ''}
                     </div>
-                ` : ''}
 
-                <!-- デコレーション -->
-                <div style="
-                    text-align: center;
-                    font-size: 40pt;
-                    margin-top: 10mm;
-                ">
-                    ${template.decorations.join(' ')}
+                    <!-- 写真グリッド -->
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 5mm;
+                        margin-bottom: 10mm;
+                    ">
+                        ${displayPhotos.map(photo => `
+                            <div style="
+                                aspect-ratio: 1;
+                                overflow: hidden;
+                                border-radius: 8px;
+                                border: 3px solid ${template.colors.primary};
+                            ">
+                                <img src="${photo.data}" style="
+                                    width: 100%;
+                                    height: 100%;
+                                    object-fit: cover;
+                                ">
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- コメント -->
+                    ${comment ? `
+                        <div style="
+                            padding: 8mm;
+                            background: white;
+                            border: 3px solid ${template.colors.secondary};
+                            border-radius: 10px;
+                            font-size: 14pt;
+                            line-height: 1.8;
+                            white-space: pre-wrap;
+                        ">
+                            ${comment}
+                        </div>
+                    ` : ''}
+
+                    <!-- デコレーション -->
+                    <div style="
+                        text-align: center;
+                        font-size: 40pt;
+                        margin-top: 10mm;
+                    ">
+                        ${template.decorations.join(' ')}
+                    </div>
                 </div>
             </div>
         `;

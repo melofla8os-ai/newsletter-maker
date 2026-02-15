@@ -266,15 +266,56 @@ main {
 /* プレビューエリア */
 .preview-area {
     margin-top: 30px;
-    padding: 40px;
-    background: white;
+    padding: 20px;
+    background: #f5f5f5;
     border: 2px solid #ddd;
     border-radius: 10px;
     min-height: 200px;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .preview-area.active {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* プレビューコンテンツラッパー */
+.preview-wrapper {
+    transform-origin: top center;
+    transition: transform 0.3s ease;
+}
+
+/* 画面サイズに応じたスケーリング */
+@media (max-width: 1400px) {
+    .preview-wrapper {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 1200px) {
+    .preview-wrapper {
+        transform: scale(0.7);
+    }
+}
+
+@media (max-width: 1000px) {
+    .preview-wrapper {
+        transform: scale(0.6);
+    }
+}
+
+@media (max-width: 800px) {
+    .preview-wrapper {
+        transform: scale(0.5);
+    }
+}
+
+@media (max-width: 600px) {
+    .preview-wrapper {
+        transform: scale(0.4);
+    }
 }
 
 /* 出力ボタン */
@@ -317,13 +358,35 @@ footer {
 @media print {
     body {
         background: white;
+        padding: 0;
     }
 
     .container {
         box-shadow: none;
     }
 
-    .step-section:not(.preview-area) {
+    header, footer {
         display: none;
+    }
+
+    .step-section:not(#previewArea) {
+        display: none;
+    }
+
+    .preview-area {
+        padding: 0;
+        border: none;
+        margin: 0;
+    }
+
+    /* 印刷時はスケーリングを無効化 */
+    .preview-wrapper {
+        transform: none !important;
+    }
+
+    /* ページサイズをA4に設定 */
+    @page {
+        size: A4;
+        margin: 0;
     }
 }
