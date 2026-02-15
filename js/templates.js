@@ -3,6 +3,7 @@ const MONTH_TEMPLATES = {
     1: {
         name: '新年会',
         theme: '新年',
+        layoutType: 'grid-5x4',
         colors: {
             primary: '#DC143C',
             secondary: '#FFD700',
@@ -20,6 +21,7 @@ const MONTH_TEMPLATES = {
     2: {
         name: '節分',
         theme: '節分',
+        layoutType: 'feature-spotlight',
         colors: {
             primary: '#4169E1',
             secondary: '#FFD700',
@@ -37,6 +39,7 @@ const MONTH_TEMPLATES = {
     3: {
         name: 'ひな祭り',
         theme: 'ひな祭り',
+        layoutType: 'magazine-2col',
         colors: {
             primary: '#FF69B4',
             secondary: '#FFB6C1',
@@ -54,6 +57,7 @@ const MONTH_TEMPLATES = {
     4: {
         name: 'お花見',
         theme: 'お花見',
+        layoutType: 'grid-5x4',
         colors: {
             primary: '#FFB7C5',
             secondary: '#FFC0CB',
@@ -71,6 +75,7 @@ const MONTH_TEMPLATES = {
     5: {
         name: '端午の節句',
         theme: '端午の節句',
+        layoutType: 'magazine-2col',
         colors: {
             primary: '#228B22',
             secondary: '#4169E1',
@@ -88,6 +93,7 @@ const MONTH_TEMPLATES = {
     6: {
         name: '紫陽花鑑賞',
         theme: '紫陽花',
+        layoutType: 'feature-spotlight',
         colors: {
             primary: '#9370DB',
             secondary: '#87CEEB',
@@ -105,6 +111,7 @@ const MONTH_TEMPLATES = {
     7: {
         name: '七夕',
         theme: '七夕',
+        layoutType: 'magazine-3col',
         colors: {
             primary: '#4169E1',
             secondary: '#FFD700',
@@ -122,6 +129,7 @@ const MONTH_TEMPLATES = {
     8: {
         name: '夏祭り',
         theme: '夏祭り',
+        layoutType: 'magazine-3col',
         colors: {
             primary: '#DC143C',
             secondary: '#FFD700',
@@ -139,6 +147,7 @@ const MONTH_TEMPLATES = {
     9: {
         name: '敬老の日',
         theme: '敬老の日',
+        layoutType: 'mixed-sections',
         colors: {
             primary: '#FF8C00',
             secondary: '#FFD700',
@@ -156,6 +165,7 @@ const MONTH_TEMPLATES = {
     10: {
         name: '運動会',
         theme: '運動会',
+        layoutType: 'mixed-sections',
         colors: {
             primary: '#DC143C',
             secondary: '#4169E1',
@@ -173,6 +183,7 @@ const MONTH_TEMPLATES = {
     11: {
         name: '紅葉狩り',
         theme: '紅葉',
+        layoutType: 'feature-spotlight',
         colors: {
             primary: '#FF6347',
             secondary: '#FFD700',
@@ -190,6 +201,7 @@ const MONTH_TEMPLATES = {
     12: {
         name: 'クリスマス',
         theme: 'クリスマス',
+        layoutType: 'magazine-3col',
         colors: {
             primary: '#DC143C',
             secondary: '#228B22',

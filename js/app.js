@@ -210,8 +210,30 @@ class NewsletterApp {
         console.log('プレビュー表示');
     }
 
-    // プレビューHTML生成
+    // プレビューHTML生成 (レイアウトルーティング)
     generatePreviewHTML() {
+        // layoutType を取得 (後方互換性: 未定義なら grid-5x4)
+        const layoutType = this.currentTemplate.layoutType || 'grid-5x4';
+
+        // LAYOUT_TEMPLATES から適切なジェネレーター関数を取得
+        const layoutConfig = LAYOUT_TEMPLATES[layoutType];
+        if (!layoutConfig) {
+            console.error(`Unknown layout type: ${layoutType}`);
+            return this.generateGrid5x4Layout(); // フォールバック
+        }
+
+        // ジェネレーター関数を呼び出し
+        const generatorFuncName = layoutConfig.generator;
+        if (typeof window[generatorFuncName] === 'function') {
+            return window[generatorFuncName](this);
+        } else {
+            console.error(`Generator function not found: ${generatorFuncName}`);
+            return this.generateGrid5x4Layout(); // フォールバック
+        }
+    }
+
+    // 標準グリッド 5×4 レイアウト (既存レイアウトを維持)
+    generateGrid5x4Layout() {
         const template = this.currentTemplate;
         const eventTitle = document.getElementById('eventTitle').value || 'イベント';
         const eventDate = document.getElementById('eventDate').value;
