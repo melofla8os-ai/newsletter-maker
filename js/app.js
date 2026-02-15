@@ -348,12 +348,30 @@ class NewsletterApp {
         }
 
         try {
+            // プレビューラッパーを取得
+            const wrapper = document.querySelector('.preview-wrapper');
+            if (!wrapper) {
+                alert('プレビューが見つかりません!');
+                return;
+            }
+
+            // スケーリングを一時的に無効化
+            const originalTransform = wrapper.style.transform;
+            wrapper.style.transform = 'scale(1)';
+
+            // 少し待ってからキャンバス化（レンダリング完了を待つ）
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             // html2canvasを使用してキャンバスに変換
-            const canvas = await html2canvas(previewArea, {
+            const canvas = await html2canvas(wrapper, {
                 scale: 2,
                 useCORS: true,
-                logging: false
+                logging: false,
+                backgroundColor: null
             });
+
+            // スケーリングを元に戻す
+            wrapper.style.transform = originalTransform;
 
             // jsPDFでPDF生成
             const { jsPDF } = window.jspdf;
