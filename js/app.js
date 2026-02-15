@@ -224,8 +224,8 @@ class NewsletterApp {
             dateStr = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
         }
 
-        // 写真をグリッド表示(最大12枚をプレビュー)
-        const displayPhotos = this.photos.slice(0, 12);
+        // 写真をグリッド表示(最大20枚)
+        const displayPhotos = this.photos.slice(0, 20);
 
         let html = `
             <div class="preview-wrapper">
@@ -233,43 +233,47 @@ class NewsletterApp {
                     width: 210mm;
                     height: 297mm;
                     margin: 0 auto;
-                    padding: 20mm;
+                    padding: 12mm;
                     background: ${template.colors.background};
                     border: 2px solid ${template.colors.primary};
                     box-sizing: border-box;
                     font-family: 'Yu Gothic', 'Meiryo', sans-serif;
                     box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                    display: flex;
+                    flex-direction: column;
                 ">
                     <!-- ヘッダー -->
                     <div style="
                         text-align: center;
-                        margin-bottom: 10mm;
-                        padding: 10mm;
+                        margin-bottom: 5mm;
+                        padding: 6mm;
                         background: linear-gradient(135deg, ${template.colors.primary} 0%, ${template.colors.secondary} 100%);
                         color: white;
-                        border-radius: 10px;
+                        border-radius: 8px;
+                        flex-shrink: 0;
                     ">
                         <h1 style="
-                            font-size: 32pt;
-                            margin: 0 0 5mm 0;
+                            font-size: 26pt;
+                            margin: 0 0 3mm 0;
                             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
                         ">${template.decorations[0]} ${eventTitle} ${template.decorations[0]}</h1>
-                        ${dateStr ? `<p style="font-size: 18pt; margin: 0;">${dateStr}</p>` : ''}
+                        ${dateStr ? `<p style="font-size: 14pt; margin: 0;">${dateStr}</p>` : ''}
                     </div>
 
                     <!-- 写真グリッド -->
                     <div style="
                         display: grid;
-                        grid-template-columns: repeat(3, 1fr);
-                        gap: 5mm;
-                        margin-bottom: 10mm;
+                        grid-template-columns: repeat(5, 1fr);
+                        gap: 3mm;
+                        margin-bottom: 5mm;
+                        flex-shrink: 0;
                     ">
                         ${displayPhotos.map(photo => `
                             <div style="
                                 aspect-ratio: 1;
                                 overflow: hidden;
-                                border-radius: 8px;
-                                border: 3px solid ${template.colors.primary};
+                                border-radius: 6px;
+                                border: 2px solid ${template.colors.primary};
                             ">
                                 <img src="${photo.data}" style="
                                     width: 100%;
@@ -283,13 +287,16 @@ class NewsletterApp {
                     <!-- コメント -->
                     ${comment ? `
                         <div style="
-                            padding: 8mm;
+                            padding: 5mm;
                             background: white;
-                            border: 3px solid ${template.colors.secondary};
-                            border-radius: 10px;
-                            font-size: 14pt;
-                            line-height: 1.8;
+                            border: 2px solid ${template.colors.secondary};
+                            border-radius: 8px;
+                            font-size: 11pt;
+                            line-height: 1.6;
                             white-space: pre-wrap;
+                            flex-shrink: 0;
+                            overflow: hidden;
+                            max-height: 45mm;
                         ">
                             ${comment}
                         </div>
@@ -298,8 +305,10 @@ class NewsletterApp {
                     <!-- デコレーション -->
                     <div style="
                         text-align: center;
-                        font-size: 40pt;
-                        margin-top: 10mm;
+                        font-size: 28pt;
+                        margin-top: auto;
+                        padding-top: 3mm;
+                        flex-shrink: 0;
                     ">
                         ${template.decorations.join(' ')}
                     </div>
