@@ -1,0 +1,329 @@
+/* リセット & 基本設定 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+/* ヘッダー */
+header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+/* メインコンテンツ */
+main {
+    padding: 40px;
+}
+
+.step-section {
+    margin-bottom: 40px;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 15px;
+    border-left: 5px solid #667eea;
+}
+
+.step-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* 月選択 */
+.month-selector {
+    text-align: center;
+}
+
+.month-select {
+    width: 100%;
+    max-width: 400px;
+    padding: 15px;
+    font-size: 1.1rem;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.month-select:hover {
+    border-color: #f5576c;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.month-select:focus {
+    outline: none;
+    border-color: #f5576c;
+}
+
+/* アップロードエリア */
+.upload-area {
+    border: 3px dashed #667eea;
+    border-radius: 15px;
+    padding: 50px;
+    text-align: center;
+    background: white;
+    transition: all 0.3s;
+}
+
+.upload-area:hover {
+    border-color: #f5576c;
+    background: #f0f4ff;
+}
+
+.upload-area.drag-over {
+    border-color: #f5576c;
+    background: #ffe0e6;
+    transform: scale(1.02);
+}
+
+.upload-text {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.upload-hint {
+    margin-top: 15px;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+/* ボタン */
+.btn-primary, .btn-secondary, .btn-success {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+    margin: 10px;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(250, 112, 154, 0.4);
+}
+
+/* 写真プレビュー */
+.photo-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.photo-item:hover {
+    transform: scale(1.05);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.8);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-remove:hover {
+    background: red;
+}
+
+/* 入力グループ */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* コメントエリア */
+.comment-area {
+    margin-top: 20px;
+}
+
+.comment-area label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: bold;
+}
+
+.comment-area textarea {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Yu Gothic', 'Meiryo', sans-serif;
+    resize: vertical;
+}
+
+.comment-area textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* プレビューエリア */
+.preview-area {
+    margin-top: 30px;
+    padding: 40px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    min-height: 200px;
+}
+
+.preview-area.active {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* 出力ボタン */
+.output-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* フッター */
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+/* レスポンシブ */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    main {
+        padding: 20px;
+    }
+
+    .step-section {
+        padding: 20px;
+    }
+
+    .photo-preview {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+}
+
+/* A4 印刷用スタイル */
+@media print {
+    body {
+        background: white;
+    }
+
+    .container {
+        box-shadow: none;
+    }
+
+    .step-section:not(.preview-area) {
+        display: none;
+    }
+}

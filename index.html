@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新聞作成ツール - Newsletter Maker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header>
+            <h1>📰 新聞作成ツール</h1>
+            <p class="subtitle">高齢者福祉施設向け</p>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main>
+            <!-- ステップ1: 月選択 -->
+            <section class="step-section">
+                <h2>📅 ステップ1: 月を選択</h2>
+                <div class="month-selector">
+                    <select id="monthSelect" class="month-select">
+                        <option value="">-- 月を選んでください --</option>
+                        <option value="1">1月 - 新年会</option>
+                        <option value="2">2月 - 節分</option>
+                        <option value="3">3月 - ひな祭り</option>
+                        <option value="4">4月 - お花見</option>
+                        <option value="5">5月 - 端午の節句</option>
+                        <option value="6">6月 - 紫陽花鑑賞</option>
+                        <option value="7">7月 - 七夕</option>
+                        <option value="8">8月 - 夏祭り</option>
+                        <option value="9">9月 - 敬老の日</option>
+                        <option value="10">10月 - 運動会</option>
+                        <option value="11">11月 - 紅葉狩り</option>
+                        <option value="12">12月 - クリスマス</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- ステップ2: 写真アップロード -->
+            <section class="step-section">
+                <h2>📸 ステップ2: 写真をアップロード</h2>
+                <div class="upload-area" id="uploadArea">
+                    <p class="upload-text">ここに写真をドラッグ&ドロップ<br>または</p>
+                    <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                        📁 ファイルを選択
+                    </button>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    <p class="upload-hint">最大20枚まで</p>
+                </div>
+                <div id="photoPreview" class="photo-preview"></div>
+            </section>
+
+            <!-- ステップ3: タイトル・行事名入力 -->
+            <section class="step-section">
+                <h2>✏️ ステップ3: タイトル・行事名</h2>
+                <div class="input-group">
+                    <label for="eventTitle">行事名:</label>
+                    <input type="text" id="eventTitle" placeholder="例: 新年お楽しみ会">
+                </div>
+                <div class="input-group">
+                    <label for="eventDate">開催日:</label>
+                    <input type="date" id="eventDate">
+                </div>
+            </section>
+
+            <!-- ステップ4: コメント生成 -->
+            <section class="step-section">
+                <h2>💬 ステップ4: コメント生成</h2>
+                <button class="btn-primary" id="generateBtn">✨ コメント自動生成</button>
+                <div class="comment-area" id="commentArea" style="display: none;">
+                    <label for="commentText">コメント(編集可能):</label>
+                    <textarea id="commentText" rows="4"></textarea>
+                </div>
+            </section>
+
+            <!-- ステップ5: プレビュー -->
+            <section class="step-section">
+                <h2>👀 ステップ5: プレビュー</h2>
+                <button class="btn-secondary" id="previewBtn">🔍 プレビュー表示</button>
+                <div id="previewArea" class="preview-area"></div>
+            </section>
+
+            <!-- ステップ6: 出力 -->
+            <section class="step-section">
+                <h2>🖨️ ステップ6: 出力</h2>
+                <div class="output-buttons">
+                    <button class="btn-success" id="printBtn">🖨️ 印刷</button>
+                    <button class="btn-success" id="pdfBtn">📄 PDF保存</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- フッター -->
+        <footer>
+            <p>Newsletter Maker v1.0 - 高齢者福祉施設向け新聞作成ツール</p>
+        </footer>
+    </div>
+
+    <!-- 外部ライブラリ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- アプリケーションスクリプト -->
+    <script src="js/templates.js"></script>
+    <script src="js/generator.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
