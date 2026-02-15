@@ -274,11 +274,16 @@ class NewsletterApp {
                                 overflow: hidden;
                                 border-radius: 6px;
                                 border: 2px solid ${template.colors.primary};
+                                position: relative;
                             ">
                                 <img src="${photo.data}" style="
+                                    position: absolute;
+                                    top: 0;
+                                    left: 0;
                                     width: 100%;
                                     height: 100%;
                                     object-fit: cover;
+                                    object-position: center center;
                                 ">
                             </div>
                         `).join('')}
