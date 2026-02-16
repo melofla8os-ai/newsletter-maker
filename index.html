@@ -38,9 +38,16 @@
                 </div>
             </section>
 
-            <!-- ステップ2: 写真アップロード -->
+            <!-- ステップ2: レイアウト選択 -->
             <section class="step-section">
-                <h2>📸 ステップ2: 写真をアップロード</h2>
+                <h2>🎨 ステップ2: レイアウトを選択</h2>
+                <p class="layout-instruction">写真の並べ方を選んでください</p>
+                <div id="layoutSelector" class="layout-selector"></div>
+            </section>
+
+            <!-- ステップ3: 写真アップロード -->
+            <section class="step-section">
+                <h2>📸 ステップ3: 写真をアップロード</h2>
                 <div class="upload-area" id="uploadArea">
                     <p class="upload-text">ここに写真をドラッグ&ドロップ<br>または</p>
                     <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
@@ -52,9 +59,9 @@
                 <div id="photoPreview" class="photo-preview"></div>
             </section>
 
-            <!-- ステップ3: タイトル・行事名入力 -->
+            <!-- ステップ4: タイトル・行事名入力 -->
             <section class="step-section">
-                <h2>✏️ ステップ3: タイトル・行事名</h2>
+                <h2>✏️ ステップ4: タイトル・行事名</h2>
                 <div class="input-group">
                     <label for="eventTitle">行事名:</label>
                     <input type="text" id="eventTitle" placeholder="例: 新年お楽しみ会">
@@ -65,26 +72,36 @@
                 </div>
             </section>
 
-            <!-- ステップ4: コメント生成 -->
+            <!-- ステップ4.5: セクション名を変更(任意) -->
+            <section class="step-section" id="sectionTitleStep" style="display: none;">
+                <h2>🏷️ ステップ4.5: セクション名を変更(任意)</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 1rem;">セクションの名前を変えたい場合のみ編集してください</p>
+                <div id="sectionTitleInputs"></div>
+            </section>
+
+            <!-- ステップ5: コメント生成 -->
             <section class="step-section">
-                <h2>💬 ステップ4: コメント生成</h2>
+                <h2>💬 ステップ5: コメント生成</h2>
                 <button class="btn-primary" id="generateBtn">✨ コメント自動生成</button>
                 <div class="comment-area" id="commentArea" style="display: none;">
                     <label for="commentText">コメント(編集可能):</label>
                     <textarea id="commentText" rows="4"></textarea>
+                    <div id="commentLengthWarning" style="display: none; color: #f5576c; font-size: 1rem; margin-top: 10px; padding: 10px; background: #ffe0e6; border-radius: 8px; border: 2px solid #f5576c;">
+                        ⚠️ コメントが長すぎます。印刷時に切れる可能性があります。
+                    </div>
                 </div>
             </section>
 
-            <!-- ステップ5: プレビュー -->
+            <!-- ステップ6: プレビュー -->
             <section class="step-section">
-                <h2>👀 ステップ5: プレビュー</h2>
+                <h2>👀 ステップ6: プレビュー</h2>
                 <button class="btn-secondary" id="previewBtn">🔍 プレビュー表示</button>
                 <div id="previewArea" class="preview-area"></div>
             </section>
 
-            <!-- ステップ6: 出力 -->
+            <!-- ステップ7: 出力 -->
             <section class="step-section">
-                <h2>🖨️ ステップ6: 出力</h2>
+                <h2>🖨️ ステップ7: 出力</h2>
                 <div class="output-buttons">
                     <button class="btn-success" id="printBtn">🖨️ 印刷</button>
                     <button class="btn-success" id="pdfBtn">📄 PDF保存</button>

@@ -33,6 +33,25 @@ const LAYOUT_TEMPLATES = {
 // ====================================
 
 /**
+ * 動的フォントサイズ調整（A4見切れ防止）
+ * @param {number} estimatedHeight - 推定コンテンツ高さ（mm）
+ * @param {number} maxHeight - 最大高さ（デフォルト: 277mm = 297mm - 20mm padding）
+ * @returns {Object} 調整後のサイズ設定
+ */
+function calculateDynamicSizing(estimatedHeight, maxHeight = 277) {
+    const scale = Math.min(1, maxHeight / estimatedHeight);
+
+    return {
+        headerFontSize: Math.max(18, 26 * scale), // 26pt → 最小18pt
+        sectionHeaderFont: Math.max(10, 12 * scale), // 12pt → 最小10pt
+        commentFont: Math.max(9, 11 * scale), // 11pt → 最小9pt
+        photoGap: Math.max(1.5, 2 * scale), // 2mm → 最小1.5mm
+        sectionGap: Math.max(2, 3 * scale), // 3mm → 最小2mm
+        scale: scale
+    };
+}
+
+/**
  * ヘッダー部分を生成
  */
 function generateHeader(title, date, template) {
@@ -82,7 +101,7 @@ function generateFooter(template) {
 /**
  * コメントセクションを生成
  */
-function generateCommentSection(comment, template) {
+function generateCommentSection(comment, template, fontSize = 11) {
     if (!comment) return '';
 
     return `
@@ -91,7 +110,7 @@ function generateCommentSection(comment, template) {
             background: white;
             border: 2px solid ${template.colors.secondary};
             border-radius: 8px;
-            font-size: 11pt;
+            font-size: ${fontSize}pt;
             line-height: 1.6;
             white-space: pre-wrap;
             flex-shrink: 0;
@@ -189,13 +208,10 @@ function generatePageWrapper(content, template) {
     return `
         <div class="preview-wrapper">
             <div style="
-                width: 210mm;
-                height: 297mm;
+                max-width: 210mm;
                 margin: 0 auto;
-                padding: 10mm;
+                padding: 5mm;
                 background: ${template.colors.background};
-                border: 2px solid ${template.colors.primary};
-                box-sizing: border-box;
                 font-family: 'Yu Gothic', 'Meiryo', sans-serif;
                 box-shadow: 0 5px 20px rgba(0,0,0,0.2);
                 display: flex;
@@ -344,9 +360,9 @@ function generateMagazine3ColLayout(app) {
             gap: 4mm;
             margin-bottom: 5mm;
         ">
-            ${generateColumn('活動①', col1)}
-            ${generateColumn('活動②', col2)}
-            ${generateColumn('活動③', col3)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section1 || '活動①', col1)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section2 || '活動②', col2)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section3 || '活動③', col3)}
         </div>
 
         ${generateCommentSection(comment, template)}
@@ -408,31 +424,42 @@ function generateMixedSectionsLayout(app) {
     const section2 = photos.slice(6, 12);
     const section3 = photos.slice(12, 18);
 
+    // デフォルトサイズを使用（レンダリング後にapp.jsで自動調整）
+    // 18枚の写真を収めるため、余白を控えめに
+    const sizing = {
+        headerFontSize: 24, // 26 → 24pt（少し小さく）
+        sectionHeaderFont: 11, // 12 → 11pt
+        commentFont: 10, // 11 → 10pt
+        photoGap: 1.5, // 2 → 1.5mm（写真間を詰める）
+        sectionGap: 2, // 3 → 2mm（セクション間を詰める）
+        scale: 1
+    };
+
     const content = `
         ${generateHeader(eventTitle, eventDate, template)}
 
-        <div style="margin-bottom: 3mm;">
-            ${generateSectionHeader('午前の部', template)}
-            ${generatePhotoGrid(section1, 3, template, '2mm')}
+        <div style="margin-bottom: ${sizing.sectionGap}mm;">
+            ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section1 || '午前の部', template)}
+            ${generatePhotoGrid(section1, 3, template, `${sizing.photoGap}mm`)}
         </div>
 
         <div style="
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 3mm;
-            margin-bottom: 3mm;
+            gap: ${sizing.sectionGap}mm;
+            margin-bottom: ${sizing.sectionGap}mm;
         ">
             <div>
-                ${generateSectionHeader('午後の部', template)}
-                ${generatePhotoGrid(section2, 2, template, '2mm')}
+                ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section2 || '午後の部', template)}
+                ${generatePhotoGrid(section2, 2, template, `${sizing.photoGap}mm`)}
             </div>
             <div>
-                ${generateSectionHeader('エンディング', template)}
-                ${generatePhotoGrid(section3, 2, template, '2mm')}
+                ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section3 || 'エンディング', template)}
+                ${generatePhotoGrid(section3, 2, template, `${sizing.photoGap}mm`)}
             </div>
         </div>
 
-        ${generateCommentSection(comment, template)}
+        ${generateCommentSection(comment, template, sizing.commentFont)}
         ${generateFooter(template)}
     `;
 
