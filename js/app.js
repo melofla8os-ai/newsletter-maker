@@ -31,6 +31,7 @@ class NewsletterApp {
         this.loadFromLocalStorage(); // ローカルストレージから復元
         this.renderLayoutSelector(); // レイアウト選択UIを生成
         this.setupEventListeners();
+        this.updateProgress(); // 初期進捗状態を更新
         console.log('Newsletter Maker initialized!');
     }
 
@@ -69,11 +70,13 @@ class NewsletterApp {
         const eventTitle = document.getElementById('eventTitle');
         eventTitle.addEventListener('input', (e) => {
             this.eventTitle = e.target.value;
+            this.updateProgress(); // 進捗更新
         });
 
         const eventDate = document.getElementById('eventDate');
         eventDate.addEventListener('change', (e) => {
             this.eventDate = e.target.value;
+            this.updateProgress(); // 進捗更新
         });
 
         // コメント編集
@@ -98,6 +101,7 @@ class NewsletterApp {
 
         this.currentTemplate = getTemplate(this.selectedMonth);
         commentGenerator.setTemplate(this.selectedMonth);
+        this.updateProgress(); // 進捗更新
 
         // レイアウトが未選択なら、テンプレートのデフォルトレイアウトを設定
         if (!this.selectedLayoutType) {
@@ -154,7 +158,7 @@ class NewsletterApp {
 
         // 上限到達チェック
         if (remainingSlots === 0) {
-            alert(`現在のレイアウトは${maxPhotos}枚までです。\n\nレイアウトを変更するか、不要な写真を削除してください。`);
+            alert(`📸 写真の上限に達しています！\n\n現在のレイアウト: 最大${maxPhotos}枚\n\n【対処法】\n✅ ステップ2でレイアウトを変更する\n✅ 不要な写真の「×」ボタンで削除する`);
             return;
         }
 
@@ -250,12 +254,15 @@ class NewsletterApp {
 
             photoSection.querySelector('#photoPreview').after(countDisplay);
         }
+
+        this.saveToLocalStorage();
+        this.updateProgress(); // 進捗更新
     }
 
     // コメント生成
     generateComment() {
         if (!this.selectedMonth) {
-            alert('まず月を選択してください!');
+            alert('📅 月が選択されていません！\n\n【対処法】\n✅ ステップ1で月を選択してください\n（例: 1月 - 新年会）');
             return;
         }
 
@@ -271,18 +278,19 @@ class NewsletterApp {
         commentArea.style.display = 'block';
         commentText.value = this.comment;
 
+        this.updateProgress(); // 進捗更新
         console.log('コメント生成完了');
     }
 
     // プレビュー表示
     showPreview() {
         if (!this.selectedMonth) {
-            alert('まず月を選択してください!');
+            alert('📅 月が選択されていません！\n\n【対処法】\n✅ ステップ1で月を選択してください');
             return;
         }
 
         if (this.photos.length === 0) {
-            alert('写真を追加してください!');
+            alert('📸 写真が追加されていません！\n\n【対処法】\n✅ ステップ3でファイルを選択\n✅ または写真をドラッグ&ドロップ');
             return;
         }
 
@@ -293,6 +301,10 @@ class NewsletterApp {
         // 画像読み込み完了後にA4フィット確認（500ms待機）
         setTimeout(() => {
             this.checkAndAdjustA4Fit();
+            // Quick編集ボタンを追加
+            this.addQuickEditButtons();
+            // 進捗更新
+            this.updateProgress();
         }, 500);
 
         console.log('プレビュー表示');
@@ -511,7 +523,7 @@ class NewsletterApp {
     // 印刷
     print() {
         if (!this.selectedMonth || this.photos.length === 0) {
-            alert('プレビューを表示してから印刷してください!');
+            alert('🖨️ 印刷できません！\n\n【対処法】\n✅ ステップ6で「プレビュー表示」ボタンをクリック\n✅ プレビューを確認してから印刷してください');
             return;
         }
 
@@ -521,13 +533,13 @@ class NewsletterApp {
     // PDF保存
     async savePDF() {
         if (!this.selectedMonth || this.photos.length === 0) {
-            alert('プレビューを表示してからPDF保存してください!');
+            alert('📄 PDF保存できません！\n\n【対処法】\n✅ ステップ6で「プレビュー表示」ボタンをクリック\n✅ プレビューを確認してからPDF保存してください');
             return;
         }
 
         const previewArea = document.getElementById('previewArea');
         if (!previewArea.innerHTML) {
-            alert('プレビューを表示してからPDF保存してください!');
+            alert('📄 PDF保存できません！\n\n【対処法】\n✅ ステップ6で「プレビュー表示」ボタンをクリックしてください');
             return;
         }
 
@@ -535,7 +547,7 @@ class NewsletterApp {
             // プレビューラッパーを取得
             const wrapper = document.querySelector('.preview-wrapper');
             if (!wrapper) {
-                alert('プレビューが見つかりません!');
+                alert('⚠️ プレビューが見つかりません！\n\n【対処法】\n✅ ページを再読み込みしてください\n✅ もう一度プレビュー表示してください');
                 return;
             }
 
@@ -578,7 +590,7 @@ class NewsletterApp {
             console.log('PDF保存完了');
         } catch (error) {
             console.error('PDF生成エラー:', error);
-            alert('PDF生成中にエラーが発生しました。');
+            alert('⚠️ PDF生成中にエラーが発生しました！\n\n【対処法】\n✅ ページを再読み込みしてください\n✅ 写真のサイズが大きすぎる場合は枚数を減らしてください\n✅ 別のブラウザ（Chrome推奨）で試してください\n\nエラー詳細: ' + error.message);
         }
     }
 
@@ -643,6 +655,7 @@ class NewsletterApp {
         this.updateLayoutSelector();
         this.showSectionTitleEditor(layoutType); // セクションタイトル編集UIを表示
         this.saveToLocalStorage();
+        this.updateProgress(); // 進捗更新
 
         const layout = LAYOUT_TEMPLATES[layoutType];
         console.log(`レイアウト選択: ${layout.name} (${layout.photoSlots}枚)`);
@@ -780,6 +793,202 @@ class NewsletterApp {
                 });
             }
         });
+    }
+
+    /**
+     * Quick編集ボタンをプレビューに追加
+     */
+    addQuickEditButtons() {
+        const wrapper = document.querySelector('.preview-wrapper > div');
+        if (!wrapper) return;
+
+        // ヘッダー部分に編集ボタンを追加
+        const header = wrapper.querySelector('div[style*="linear-gradient"]');
+        if (header && !header.querySelector('.quick-edit-btn')) {
+            const editBtn = this.createEditButton('eventTitle', 'タイトル・日付を編集');
+            editBtn.style.cssText = `
+                position: absolute;
+                top: 5mm;
+                right: 5mm;
+                z-index: 10;
+            `;
+            header.style.position = 'relative';
+            header.appendChild(editBtn);
+        }
+
+        // コメントセクションに編集ボタンを追加
+        const commentSection = wrapper.querySelector('div[style*="line-height: 1.8"]');
+        if (commentSection && !commentSection.querySelector('.quick-edit-btn')) {
+            const editBtn = this.createEditButton('commentText', 'コメントを編集');
+            editBtn.style.cssText = `
+                position: absolute;
+                top: 3mm;
+                right: 3mm;
+                z-index: 10;
+            `;
+            commentSection.style.position = 'relative';
+            commentSection.appendChild(editBtn);
+        }
+
+        // セクションタイトル編集ボタン（該当レイアウトのみ）
+        const layoutType = this.selectedLayoutType || this.currentTemplate?.layoutType;
+        if (layoutType === 'mixed-sections' || layoutType === 'magazine-3col') {
+            const sectionHeaders = wrapper.querySelectorAll('.section-title');
+            sectionHeaders.forEach((header, index) => {
+                if (!header.querySelector('.quick-edit-btn')) {
+                    const editBtn = this.createEditButton('sectionTitleInputs', `セクション${index + 1}を編集`, true);
+                    editBtn.style.cssText = `
+                        position: absolute;
+                        top: 1mm;
+                        right: 1mm;
+                        z-index: 10;
+                        font-size: 10pt;
+                        padding: 3px 8px;
+                    `;
+                    header.style.position = 'relative';
+                    header.appendChild(editBtn);
+                }
+            });
+        }
+
+        console.log('Quick編集ボタンを追加しました');
+    }
+
+    /**
+     * 編集ボタン要素を作成
+     */
+    createEditButton(targetId, label = '編集', isSmall = false) {
+        const btn = document.createElement('button');
+        btn.className = 'quick-edit-btn';
+        btn.innerHTML = `✏️ ${label}`;
+        btn.dataset.target = targetId;
+        btn.style.cssText = `
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            border: 2px solid #4CAF50;
+            border-radius: 6px;
+            padding: ${isSmall ? '6px 12px' : '10px 20px'};
+            font-size: ${isSmall ? '12pt' : '14pt'};
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        `;
+
+        // ホバー効果
+        btn.addEventListener('mouseenter', () => {
+            btn.style.background = '#4CAF50';
+            btn.style.color = 'white';
+            btn.style.transform = 'scale(1.05)';
+        });
+        btn.addEventListener('mouseleave', () => {
+            btn.style.background = 'rgba(255, 255, 255, 0.95)';
+            btn.style.color = '#333';
+            btn.style.transform = 'scale(1)';
+        });
+
+        // クリックイベント
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.scrollToInput(targetId);
+        });
+
+        return btn;
+    }
+
+    /**
+     * 指定された入力欄にスムーズスクロール
+     */
+    scrollToInput(targetId) {
+        const targetElement = document.getElementById(targetId);
+        if (!targetElement) {
+            console.warn(`Target element not found: ${targetId}`);
+            return;
+        }
+
+        // スムーズスクロール
+        targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        // 少し待ってからフォーカス（スクロール完了を待つ）
+        setTimeout(() => {
+            if (targetElement.tagName === 'INPUT' || targetElement.tagName === 'TEXTAREA') {
+                targetElement.focus();
+                // テキストエリアの場合は末尾にカーソル移動
+                if (targetElement.tagName === 'TEXTAREA') {
+                    targetElement.setSelectionRange(targetElement.value.length, targetElement.value.length);
+                }
+            } else {
+                // セクション全体の場合は最初の入力欄にフォーカス
+                const firstInput = targetElement.querySelector('input');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }
+
+            // ハイライト効果
+            const originalBg = targetElement.style.background;
+            targetElement.style.background = '#ffffcc';
+            setTimeout(() => {
+                targetElement.style.background = originalBg;
+            }, 1500);
+        }, 600);
+
+        console.log(`Scrolled to: ${targetId}`);
+    }
+
+    /**
+     * 進捗状態を更新
+     */
+    updateProgress() {
+        // 各ステップの完了状態をチェック
+        const steps = [
+            { id: 1, completed: this.selectedMonth !== null },                           // ステップ1: 月選択
+            { id: 2, completed: this.selectedLayoutType !== null },                       // ステップ2: レイアウト選択
+            { id: 3, completed: this.photos.length > 0 },                                 // ステップ3: 写真アップロード
+            { id: 4, completed: this.eventTitle && this.eventTitle.trim() !== '' },      // ステップ4: タイトル入力
+            { id: 5, completed: this.comment && this.comment.trim() !== '' },            // ステップ5: コメント生成
+            { id: 6, completed: document.getElementById('previewArea').innerHTML !== '' } // ステップ6: プレビュー表示
+        ];
+
+        // 完了したステップ数をカウント
+        const completedCount = steps.filter(step => step.completed).length;
+        const totalSteps = steps.length;
+        const progressPercentage = Math.round((completedCount / totalSteps) * 100);
+
+        // 進捗バーを更新
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentageText = document.getElementById('progressPercentage');
+
+        if (progressFill) {
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+
+        if (progressPercentageText) {
+            progressPercentageText.textContent = `${progressPercentage}%`;
+        }
+
+        // 各ステップの表示を更新
+        steps.forEach((step, index) => {
+            const stepElement = document.querySelector(`.progress-step[data-step="${step.id}"]`);
+            if (stepElement) {
+                // 完了状態をリセット
+                stepElement.classList.remove('completed', 'current');
+
+                if (step.completed) {
+                    // 完了済み
+                    stepElement.classList.add('completed');
+                } else if (index === 0 || steps[index - 1].completed) {
+                    // 次に実行すべきステップ（前のステップが完了している、または最初のステップ）
+                    stepElement.classList.add('current');
+                }
+            }
+        });
+
+        console.log(`進捗: ${completedCount}/${totalSteps} (${progressPercentage}%)`);
     }
 }
 
