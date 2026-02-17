@@ -87,6 +87,64 @@
                 <div id="layoutSelector" class="layout-selector"></div>
             </section>
 
+            <!-- ステップ2.5: テンプレートカスタマイズ -->
+            <section class="step-section" id="customizeStep" style="display: none;">
+                <h2>🎨 ステップ2.5: デザインをカスタマイズ（任意）</h2>
+                <p style="color: #666; margin-bottom: 15px; font-size: 1rem;">色やデザインを変更したい場合のみ編集してください</p>
+
+                <div class="customize-grid">
+                    <!-- カラー設定 -->
+                    <div class="customize-group">
+                        <h3 class="customize-group-title">🎨 カラー設定</h3>
+                        <div class="color-row">
+                            <label>メインカラー</label>
+                            <div class="color-input-wrap">
+                                <input type="color" id="customPrimary" class="color-picker">
+                                <span class="color-preview" id="primaryPreview"></span>
+                            </div>
+                        </div>
+                        <div class="color-row">
+                            <label>サブカラー</label>
+                            <div class="color-input-wrap">
+                                <input type="color" id="customSecondary" class="color-picker">
+                                <span class="color-preview" id="secondaryPreview"></span>
+                            </div>
+                        </div>
+                        <div class="color-row">
+                            <label>背景カラー</label>
+                            <div class="color-input-wrap">
+                                <input type="color" id="customBackground" class="color-picker">
+                                <span class="color-preview" id="backgroundPreview"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- プリセット -->
+                    <div class="customize-group">
+                        <h3 class="customize-group-title">✨ プリセット</h3>
+                        <div class="preset-grid" id="presetGrid"></div>
+                    </div>
+
+                    <!-- フォント設定 -->
+                    <div class="customize-group">
+                        <h3 class="customize-group-title">🔤 フォント設定</h3>
+                        <div class="font-row">
+                            <label>タイトルサイズ: <span id="titleFontVal">26</span>pt</label>
+                            <input type="range" id="titleFontSize" min="18" max="36" value="26" class="font-slider">
+                        </div>
+                        <div class="font-row">
+                            <label>コメントサイズ: <span id="commentFontVal">11</span>pt</label>
+                            <input type="range" id="commentFontSize" min="8" max="16" value="11" class="font-slider">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customize-actions">
+                    <button class="btn-secondary" id="resetCustomizeBtn">↩️ 初期値に戻す</button>
+                    <button class="btn-primary" id="applyCustomizeBtn">✅ 適用してプレビュー更新</button>
+                </div>
+            </section>
+
             <!-- ステップ3: 写真アップロード -->
             <section class="step-section">
                 <h2>📸 ステップ3: 写真をアップロード</h2>

@@ -28,6 +28,13 @@ class NewsletterApp {
         this.history = [];
         this.maxHistorySize = 5;
 
+        // カスタマイズ設定
+        this.customColors = null; // null = テンプレートのデフォルト使用
+        this.customFontSizes = {
+            titleFontSize: 26,
+            commentFontSize: 11
+        };
+
         this.init();
     }
 
@@ -35,6 +42,7 @@ class NewsletterApp {
         this.loadFromLocalStorage(); // ローカルストレージから復元
         this.renderLayoutSelector(); // レイアウト選択UIを生成
         this.setupEventListeners();
+        this.initCustomize(); // カスタマイズUI初期化
         this.updateProgress(); // 初期進捗状態を更新
         this.updateUndoButton(); // Undoボタンの初期状態を更新
         console.log('Newsletter Maker initialized!');
@@ -109,9 +117,15 @@ class NewsletterApp {
         this.selectedMonth = parseInt(e.target.value);
         if (!this.selectedMonth) return;
 
+        this.customColors = null; // 月変更時はカスタマイズをリセット
         this.currentTemplate = getTemplate(this.selectedMonth);
         commentGenerator.setTemplate(this.selectedMonth);
         this.updateProgress(); // 進捗更新
+
+        // カスタマイズパネルを表示してカラーピッカーを同期
+        const customizeStep = document.getElementById('customizeStep');
+        if (customizeStep) customizeStep.style.display = 'block';
+        this.syncColorPickersFromTemplate();
 
         // レイアウトが未選択なら、テンプレートのデフォルトレイアウトを設定
         if (!this.selectedLayoutType) {
@@ -1124,6 +1138,199 @@ class NewsletterApp {
 
         // LocalStorageにも保存
         this.saveToLocalStorage();
+    }
+
+    // ====================================
+    // テンプレートカスタマイズ機能
+    // ====================================
+
+    /**
+     * カスタマイズUIの初期化
+     */
+    initCustomize() {
+        // プリセット定義
+        const presets = [
+            { name: '🌸 春', primary: '#FF69B4', secondary: '#FFB6C1', background: '#FFF0F5' },
+            { name: '🌿 夏', primary: '#228B22', secondary: '#90EE90', background: '#F0FFF0' },
+            { name: '🍁 秋', primary: '#FF6347', secondary: '#FFD700', background: '#FFF8DC' },
+            { name: '❄️ 冬', primary: '#4169E1', secondary: '#87CEEB', background: '#F0F8FF' },
+            { name: '🎌 和風', primary: '#DC143C', secondary: '#FFD700', background: '#FFF8DC' },
+            { name: '💜 パープル', primary: '#9370DB', secondary: '#DDA0DD', background: '#F8F0FF' },
+        ];
+
+        const presetGrid = document.getElementById('presetGrid');
+        if (presetGrid) {
+            presetGrid.innerHTML = presets.map((p, i) => `
+                <button class="preset-btn" data-preset="${i}"
+                    style="background: linear-gradient(135deg, ${p.primary}, ${p.secondary});"
+                    onclick="app.applyPreset(${i})">${p.name}</button>
+            `).join('');
+        }
+        this._presets = presets;
+
+        // スライダーのリアルタイム表示
+        const titleSlider = document.getElementById('titleFontSize');
+        const commentSlider = document.getElementById('commentFontSize');
+        if (titleSlider) {
+            titleSlider.addEventListener('input', (e) => {
+                document.getElementById('titleFontVal').textContent = e.target.value;
+                this.customFontSizes.titleFontSize = parseInt(e.target.value);
+            });
+        }
+        if (commentSlider) {
+            commentSlider.addEventListener('input', (e) => {
+                document.getElementById('commentFontVal').textContent = e.target.value;
+                this.customFontSizes.commentFontSize = parseInt(e.target.value);
+            });
+        }
+
+        // カラーピッカーのリアルタイム同期
+        ['customPrimary', 'customSecondary', 'customBackground'].forEach(id => {
+            const picker = document.getElementById(id);
+            if (picker) {
+                picker.addEventListener('input', () => this.syncColorPreviews());
+            }
+        });
+
+        // ボタンのイベント
+        document.getElementById('applyCustomizeBtn')?.addEventListener('click', () => this.applyCustomize());
+        document.getElementById('resetCustomizeBtn')?.addEventListener('click', () => this.resetCustomize());
+
+        // 月が選択されていれば初期カラーを設定
+        if (this.currentTemplate) {
+            this.syncColorPickersFromTemplate();
+        }
+    }
+
+    /**
+     * テンプレートのカラーをカラーピッカーに反映
+     */
+    syncColorPickersFromTemplate() {
+        const template = this.currentTemplate;
+        if (!template) return;
+
+        const colors = this.customColors || template.colors;
+
+        const primary = document.getElementById('customPrimary');
+        const secondary = document.getElementById('customSecondary');
+        const background = document.getElementById('customBackground');
+
+        if (primary) primary.value = this.toHex(colors.primary);
+        if (secondary) secondary.value = this.toHex(colors.secondary);
+        if (background) background.value = this.toHex(colors.background);
+
+        this.syncColorPreviews();
+    }
+
+    /**
+     * カラープレビュー円を更新
+     */
+    syncColorPreviews() {
+        const ids = [
+            ['customPrimary', 'primaryPreview'],
+            ['customSecondary', 'secondaryPreview'],
+            ['customBackground', 'backgroundPreview'],
+        ];
+        ids.forEach(([pickerId, previewId]) => {
+            const val = document.getElementById(pickerId)?.value;
+            const preview = document.getElementById(previewId);
+            if (val && preview) preview.style.background = val;
+        });
+    }
+
+    /**
+     * プリセットを適用
+     */
+    applyPreset(index) {
+        const preset = this._presets[index];
+        if (!preset) return;
+
+        document.getElementById('customPrimary').value = preset.primary;
+        document.getElementById('customSecondary').value = preset.secondary;
+        document.getElementById('customBackground').value = preset.background;
+        this.syncColorPreviews();
+
+        // アクティブ表示
+        document.querySelectorAll('.preset-btn').forEach((btn, i) => {
+            btn.classList.toggle('active', i === index);
+        });
+    }
+
+    /**
+     * カスタマイズを適用してプレビューを更新
+     */
+    applyCustomize() {
+        this.customColors = {
+            primary: document.getElementById('customPrimary')?.value || this.currentTemplate?.colors.primary,
+            secondary: document.getElementById('customSecondary')?.value || this.currentTemplate?.colors.secondary,
+            background: document.getElementById('customBackground')?.value || this.currentTemplate?.colors.background,
+        };
+
+        // テンプレートに上書き適用（一時的）
+        if (this.currentTemplate) {
+            this.currentTemplate.colors = { ...this.customColors };
+        }
+
+        // フォントサイズをLayoutに反映（layouts.jsのgenerateHeader用にグローバル変数として渡す）
+        window._customFontSizes = this.customFontSizes;
+
+        this.saveToLocalStorage();
+
+        // プレビューが表示中なら自動更新
+        const previewArea = document.getElementById('previewArea');
+        if (previewArea?.innerHTML && this.photos.length > 0) {
+            this.showPreview();
+        }
+
+        console.log('カスタマイズ適用:', this.customColors);
+    }
+
+    /**
+     * カスタマイズをリセット（テンプレートのデフォルトに戻す）
+     */
+    resetCustomize() {
+        this.customColors = null;
+        window._customFontSizes = null;
+
+        // テンプレートのデフォルトカラーを復元
+        if (this.selectedMonth) {
+            this.currentTemplate = getTemplate(this.selectedMonth);
+            this.syncColorPickersFromTemplate();
+        }
+
+        // スライダーをデフォルトに戻す
+        const titleSlider = document.getElementById('titleFontSize');
+        const commentSlider = document.getElementById('commentFontSize');
+        if (titleSlider) { titleSlider.value = 26; document.getElementById('titleFontVal').textContent = '26'; }
+        if (commentSlider) { commentSlider.value = 11; document.getElementById('commentFontVal').textContent = '11'; }
+        this.customFontSizes = { titleFontSize: 26, commentFontSize: 11 };
+
+        // プリセットのアクティブを解除
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+
+        this.saveToLocalStorage();
+
+        // プレビューが表示中なら自動更新
+        const previewArea = document.getElementById('previewArea');
+        if (previewArea?.innerHTML && this.photos.length > 0) {
+            this.showPreview();
+        }
+
+        console.log('カスタマイズをリセット');
+    }
+
+    /**
+     * CSSカラー値を #RRGGBB 形式に変換
+     */
+    toHex(color) {
+        if (!color) return '#ffffff';
+        if (color.startsWith('#') && color.length === 7) return color;
+        // rgb(r,g,b) 形式を変換
+        const m = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+        if (m) {
+            return '#' + [m[1], m[2], m[3]].map(v => parseInt(v).toString(16).padStart(2, '0')).join('');
+        }
+        return color;
     }
 
     /**

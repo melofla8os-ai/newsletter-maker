@@ -61,6 +61,9 @@ function generateHeader(title, date, template) {
         dateStr = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
     }
 
+    // カスタムフォントサイズがあれば使用
+    const titleFontSize = window._customFontSizes?.titleFontSize || 26;
+
     return `
         <div style="
             text-align: center;
@@ -72,7 +75,7 @@ function generateHeader(title, date, template) {
             flex-shrink: 0;
         ">
             <h1 style="
-                font-size: 26pt;
+                font-size: ${titleFontSize}pt;
                 margin: 0 0 3mm 0;
                 text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             ">${template.decorations[0]} ${title} ${template.decorations[0]}</h1>
@@ -101,8 +104,10 @@ function generateFooter(template) {
 /**
  * コメントセクションを生成
  */
-function generateCommentSection(comment, template, fontSize = 11) {
+function generateCommentSection(comment, template, fontSize = null) {
     if (!comment) return '';
+    // カスタムフォントサイズがあれば使用
+    fontSize = fontSize || window._customFontSizes?.commentFontSize || 11;
 
     return `
         <div style="
