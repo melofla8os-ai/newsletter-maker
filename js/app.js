@@ -583,8 +583,8 @@ class NewsletterApp {
         }
 
         try {
-            // プレビューラッパーを取得
-            const wrapper = document.querySelector('.preview-wrapper');
+            // プレビューラッパー内の実際のA4コンテンツを取得（div）
+            const wrapper = document.querySelector('.preview-wrapper > div');
             if (!wrapper) {
                 alert('⚠️ プレビューが見つかりません！\n\n【対処法】\n✅ ページを再読み込みしてください\n✅ もう一度プレビュー表示してください');
                 return;
@@ -606,7 +606,9 @@ class NewsletterApp {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: null
+                backgroundColor: null,
+                windowWidth: wrapper.scrollWidth,
+                windowHeight: wrapper.scrollHeight
             });
 
             // zoom を元に戻す
@@ -624,7 +626,39 @@ class NewsletterApp {
             });
 
             const imgData = canvas.toDataURL('image/png');
-            pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
+            
+            // A4サイズに合わせて縮尺計算
+            const pageWidth = 210;
+            const pageHeight = 297;
+            
+            // キャンバスサイズからアスペクト比を計算して配置サイズを決定
+            const canvasRatio = canvas.width / canvas.height;
+            const pageRatio = pageWidth / pageHeight;
+            
+            let finalWidth, finalHeight;
+            
+            if (canvasRatio > pageRatio) {
+                // 横幅に合わせる（高さは余る）
+                finalWidth = pageWidth;
+                finalHeight = pageWidth / canvasRatio;
+            } else {
+                // 高さ制限に合わせる（横幅は余るかもしれないが、基本A4縦なので横幅基準でOKなはずだが、念のため）
+                // 通常は横幅210mmに合わせるが、高さがはみ出る場合は高さ基準に縮小
+                const heightBasedWidth = pageHeight * canvasRatio;
+                if (heightBasedWidth <= pageWidth) {
+                    finalHeight = pageHeight;
+                    finalWidth = heightBasedWidth;
+                } else {
+                    finalWidth = pageWidth;
+                    finalHeight = pageWidth / canvasRatio;
+                }
+            }
+            
+            // 中央配置のためのオフセット
+            const x = (pageWidth - finalWidth) / 2;
+            const y = 0; // 上端合わせ
+
+            pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
 
             // ファイル名生成
             const eventTitle = document.getElementById('eventTitle').value || 'newsletter';
