@@ -202,7 +202,8 @@ class NewsletterApp {
                 this.photos.push({
                     file: file,
                     data: e.target.result,
-                    name: file.name
+                    name: file.name,
+                    position: { x: 50, y: 50 }
                 });
                 this.renderPhotos();
             };
@@ -504,7 +505,9 @@ class NewsletterApp {
                         margin-bottom: 5mm;
                         flex-shrink: 0;
                     ">
-                        ${displayPhotos.map((photo, index) => `
+                        ${displayPhotos.map((photo, index) => {
+                            const pos = photo.position || { x: 50, y: 50 };
+                            return `
                             <div class="preview-photo" data-photo-index="${index}" style="
                                 aspect-ratio: 1;
                                 overflow: hidden;
@@ -519,11 +522,11 @@ class NewsletterApp {
                                     width: 100%;
                                     height: 100%;
                                     object-fit: cover;
-                                    object-position: center center;
+                                    object-position: ${pos.x}% ${pos.y}%;
                                     pointer-events: none;
                                 ">
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
 
                     <!-- コメント -->
@@ -965,7 +968,9 @@ class NewsletterApp {
     }
 
     /**
-     * 写真入れ替えハンドラーをプレビューに追加
+     * 写真入れ替え＆位置調整ハンドラーをプレビューに追加
+     * - クリック（ドラッグなし）: 入れ替えモード
+     * - ドラッグ: 表示位置調整（object-position）
      */
     addPhotoSwapHandlers() {
         const previewArea = document.getElementById('previewArea');
@@ -977,14 +982,71 @@ class NewsletterApp {
         if (!hint) {
             hint = document.createElement('div');
             hint.className = 'swap-hint';
-            hint.textContent = '💡 写真をクリックして選択 → 別の写真をクリックで入れ替え';
+            hint.textContent = '💡 クリック→別の写真クリックで入れ替え / ドラッグで表示位置を調整';
             previewArea.insertBefore(hint, wrapper);
         }
 
         let selectedIndex = null;
+        let wasDragging = false;
 
-        // イベント委譲でプレビュー全体を監視
+        // mousedown: ドラッグ開始の検出
+        wrapper.addEventListener('mousedown', (e) => {
+            const photoDiv = e.target.closest('.preview-photo');
+            if (!photoDiv) return;
+
+            const photoIndex = parseInt(photoDiv.dataset.photoIndex);
+            const img = photoDiv.querySelector('img');
+            if (!img || isNaN(photoIndex)) return;
+
+            wasDragging = false;
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startPosX = this.photos[photoIndex]?.position?.x ?? 50;
+            const startPosY = this.photos[photoIndex]?.position?.y ?? 50;
+
+            const onMouseMove = (e2) => {
+                const dx = e2.clientX - startX;
+                const dy = e2.clientY - startY;
+
+                // 5px以上動いたらドラッグと判定
+                if (!wasDragging && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+                    wasDragging = true;
+                    photoDiv.style.cursor = 'grabbing';
+                    // 入れ替え選択中なら解除
+                    if (selectedIndex !== null) {
+                        wrapper.querySelectorAll('.preview-photo.swap-selected')
+                            .forEach(el => el.classList.remove('swap-selected'));
+                        selectedIndex = null;
+                    }
+                }
+
+                if (wasDragging) {
+                    // ドラッグ方向: 右にドラッグ→写真が右に動く→左の部分が見える (x減少)
+                    const sensitivity = 0.4;
+                    const newX = Math.max(0, Math.min(100, startPosX - dx * sensitivity));
+                    const newY = Math.max(0, Math.min(100, startPosY - dy * sensitivity));
+                    img.style.objectPosition = `${newX}% ${newY}%`;
+                    if (this.photos[photoIndex]) {
+                        this.photos[photoIndex].position = { x: newX, y: newY };
+                    }
+                }
+            };
+
+            const onMouseUp = () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                if (wasDragging) photoDiv.style.cursor = '';
+            };
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault(); // テキスト選択を防止
+        });
+
+        // click: ドラッグがなかった場合のみ入れ替え処理
         wrapper.addEventListener('click', (e) => {
+            if (wasDragging) return;
+
             const photoDiv = e.target.closest('.preview-photo');
             if (!photoDiv) return;
 
@@ -992,23 +1054,20 @@ class NewsletterApp {
             if (isNaN(clickedIndex)) return;
 
             if (selectedIndex === null) {
-                // 1枚目を選択
                 selectedIndex = clickedIndex;
                 photoDiv.classList.add('swap-selected');
             } else if (selectedIndex === clickedIndex) {
-                // 同じ写真をクリック → 選択解除
                 photoDiv.classList.remove('swap-selected');
                 selectedIndex = null;
             } else {
-                // 2枚目をクリック → 入れ替え実行
                 [this.photos[selectedIndex], this.photos[clickedIndex]] =
                     [this.photos[clickedIndex], this.photos[selectedIndex]];
                 selectedIndex = null;
-                this.showPreview(); // 即再描画
+                this.showPreview();
             }
         });
 
-        console.log('写真入れ替えハンドラーを追加しました');
+        console.log('写真入れ替え・位置調整ハンドラーを追加しました');
     }
 
     /**

@@ -742,10 +742,14 @@ footer {
     outline-offset: 2px;
 }
 
-/* 写真入れ替え機能 */
+/* 写真入れ替え・位置調整 */
 .preview-photo {
-    cursor: pointer;
+    cursor: grab;
     transition: outline 0.1s;
+}
+
+.preview-photo:active {
+    cursor: grabbing;
 }
 
 .preview-photo:hover {

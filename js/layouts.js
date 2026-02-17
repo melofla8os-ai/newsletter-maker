@@ -138,7 +138,9 @@ function generatePhotoGrid(photos, columns, template, gap = '2mm', startIndex = 
             grid-template-columns: repeat(${columns}, 1fr);
             gap: ${gap};
         ">
-            ${photos.map((photo, i) => `
+            ${photos.map((photo, i) => {
+                const pos = photo.position || { x: 50, y: 50 };
+                return `
                 <div class="preview-photo" data-photo-index="${startIndex + i}" style="
                     aspect-ratio: 1;
                     overflow: hidden;
@@ -153,11 +155,11 @@ function generatePhotoGrid(photos, columns, template, gap = '2mm', startIndex = 
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                        object-position: center center;
+                        object-position: ${pos.x}% ${pos.y}%;
                         pointer-events: none;
                     ">
                 </div>
-            `).join('')}
+            `}).join('')}
         </div>
     `;
 }
@@ -190,6 +192,7 @@ function generateSectionHeader(title, template, sectionKey = null) {
  * 単一写真(大きめ)を生成
  */
 function generateLargePhoto(photo, template, height = '100mm', photoIndex = 0) {
+    const pos = photo.position || { x: 50, y: 50 };
     return `
         <div class="preview-photo" data-photo-index="${photoIndex}" style="
             height: ${height};
@@ -206,7 +209,7 @@ function generateLargePhoto(photo, template, height = '100mm', photoIndex = 0) {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                object-position: center center;
+                object-position: ${pos.x}% ${pos.y}%;
                 pointer-events: none;
             ">
         </div>
