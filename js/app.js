@@ -368,15 +368,14 @@ class NewsletterApp {
             // 縮小率を計算
             const scale = maxHeightMm / actualHeightMm;
 
-            // CSS transformで縮小
-            wrapper.style.transform = `scale(${scale})`;
-            wrapper.style.transformOrigin = 'top center';
+            // zoom プロパティで縮小（レイアウトフローに影響するため余白が出ない）
+            wrapper.style.zoom = scale;
 
             // 警告表示
             this.showA4OverflowWarning(actualHeightMm, scale);
         } else {
             // 縮小不要の場合はリセット
-            wrapper.style.transform = 'scale(1)';
+            wrapper.style.zoom = '';
             this.hideA4OverflowWarning();
         }
     }
@@ -591,9 +590,9 @@ class NewsletterApp {
                 return;
             }
 
-            // スケーリングを一時的に無効化
-            const originalTransform = wrapper.style.transform;
-            wrapper.style.transform = 'scale(1)';
+            // zoom を一時的にリセット（原寸でキャンバス化するため）
+            const originalZoom = wrapper.style.zoom;
+            wrapper.style.zoom = '';
 
             // 少し待ってからキャンバス化（レンダリング完了を待つ）
             await new Promise(resolve => setTimeout(resolve, 100));
@@ -606,8 +605,8 @@ class NewsletterApp {
                 backgroundColor: null
             });
 
-            // スケーリングを元に戻す
-            wrapper.style.transform = originalTransform;
+            // zoom を元に戻す
+            wrapper.style.zoom = originalZoom;
 
             // jsPDFでPDF生成
             const { jsPDF } = window.jspdf;
