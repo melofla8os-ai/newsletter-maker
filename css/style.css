@@ -60,6 +60,44 @@ header h1 {
     color: #333;
 }
 
+.progress-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.undo-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.undo-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.undo-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.undo-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#undoCount {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
 .progress-percentage {
     font-size: 1.5rem;
     font-weight: bold;

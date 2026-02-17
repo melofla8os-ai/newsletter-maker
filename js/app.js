@@ -24,6 +24,10 @@ class NewsletterApp {
             }
         };
 
+        // Undo履歴管理（最大5回）
+        this.history = [];
+        this.maxHistorySize = 5;
+
         this.init();
     }
 
@@ -32,6 +36,7 @@ class NewsletterApp {
         this.renderLayoutSelector(); // レイアウト選択UIを生成
         this.setupEventListeners();
         this.updateProgress(); // 初期進捗状態を更新
+        this.updateUndoButton(); // Undoボタンの初期状態を更新
         console.log('Newsletter Maker initialized!');
     }
 
@@ -96,6 +101,11 @@ class NewsletterApp {
 
     // 月選択時
     onMonthChange(e) {
+        // 変更前の状態を履歴に保存
+        if (this.selectedMonth !== null) {
+            this.saveStateToHistory();
+        }
+
         this.selectedMonth = parseInt(e.target.value);
         if (!this.selectedMonth) return;
 
@@ -151,6 +161,11 @@ class NewsletterApp {
 
     // 写真追加
     addPhotos(files) {
+        // 変更前の状態を履歴に保存
+        if (this.photos.length > 0) {
+            this.saveStateToHistory();
+        }
+
         // 選択されたレイアウトの上限を取得（未選択なら20枚）
         const layout = LAYOUT_TEMPLATES[this.selectedLayoutType];
         const maxPhotos = layout?.photoSlots || 20;
@@ -184,6 +199,9 @@ class NewsletterApp {
 
     // 写真削除
     removePhoto(index) {
+        // 削除前の状態を履歴に保存
+        this.saveStateToHistory();
+
         this.photos.splice(index, 1);
         this.renderPhotos();
     }
@@ -264,6 +282,11 @@ class NewsletterApp {
         if (!this.selectedMonth) {
             alert('📅 月が選択されていません！\n\n【対処法】\n✅ ステップ1で月を選択してください\n（例: 1月 - 新年会）');
             return;
+        }
+
+        // コメント生成前の状態を履歴に保存
+        if (this.comment) {
+            this.saveStateToHistory();
         }
 
         const eventTitle = document.getElementById('eventTitle').value;
@@ -651,6 +674,11 @@ class NewsletterApp {
      * レイアウト選択時
      */
     onLayoutSelect(layoutType) {
+        // レイアウト変更前の状態を履歴に保存
+        if (this.selectedLayoutType !== null) {
+            this.saveStateToHistory();
+        }
+
         this.selectedLayoutType = layoutType;
         this.updateLayoutSelector();
         this.showSectionTitleEditor(layoutType); // セクションタイトル編集UIを表示
@@ -989,6 +1017,137 @@ class NewsletterApp {
         });
 
         console.log(`進捗: ${completedCount}/${totalSteps} (${progressPercentage}%)`);
+    }
+
+    /**
+     * 現在の状態を履歴に保存
+     */
+    saveStateToHistory() {
+        // 現在の状態をコピー
+        const currentState = {
+            selectedMonth: this.selectedMonth,
+            selectedLayoutType: this.selectedLayoutType,
+            photos: JSON.parse(JSON.stringify(this.photos)), // ディープコピー
+            eventTitle: this.eventTitle,
+            eventDate: this.eventDate,
+            comment: this.comment,
+            sectionTitles: JSON.parse(JSON.stringify(this.sectionTitles)),
+            timestamp: Date.now()
+        };
+
+        // 履歴に追加
+        this.history.push(currentState);
+
+        // 最大サイズを超えたら古いものを削除
+        if (this.history.length > this.maxHistorySize) {
+            this.history.shift(); // 最も古い履歴を削除
+        }
+
+        // Undoボタンの状態を更新
+        this.updateUndoButton();
+
+        console.log(`履歴保存: ${this.history.length}/${this.maxHistorySize}`);
+    }
+
+    /**
+     * Undo: 前の状態に戻す
+     */
+    undo() {
+        if (this.history.length === 0) {
+            alert('⏮️ これ以上戻せません！\n\n履歴がありません。');
+            return;
+        }
+
+        // 最後の履歴を取り出す
+        const previousState = this.history.pop();
+
+        // 状態を復元
+        this.selectedMonth = previousState.selectedMonth;
+        this.selectedLayoutType = previousState.selectedLayoutType;
+        this.photos = previousState.photos;
+        this.eventTitle = previousState.eventTitle;
+        this.eventDate = previousState.eventDate;
+        this.comment = previousState.comment;
+        this.sectionTitles = previousState.sectionTitles;
+
+        // UIを更新
+        this.restoreUI();
+
+        // Undoボタンの状態を更新
+        this.updateUndoButton();
+
+        console.log(`Undo実行: 残り履歴${this.history.length}件`);
+    }
+
+    /**
+     * UIを現在の状態に復元
+     */
+    restoreUI() {
+        // 月選択
+        const monthSelect = document.getElementById('monthSelect');
+        if (monthSelect) {
+            monthSelect.value = this.selectedMonth || '';
+            if (this.selectedMonth) {
+                this.currentTemplate = getTemplate(this.selectedMonth);
+            }
+        }
+
+        // レイアウト選択
+        this.updateLayoutSelector();
+
+        // 写真
+        this.renderPhotos();
+
+        // タイトル・日付
+        const eventTitleInput = document.getElementById('eventTitle');
+        const eventDateInput = document.getElementById('eventDate');
+        if (eventTitleInput) eventTitleInput.value = this.eventTitle || '';
+        if (eventDateInput) eventDateInput.value = this.eventDate || '';
+
+        // コメント
+        const commentText = document.getElementById('commentText');
+        if (commentText) {
+            commentText.value = this.comment || '';
+            const commentArea = document.getElementById('commentArea');
+            if (this.comment && commentArea) {
+                commentArea.style.display = 'block';
+            }
+        }
+
+        // セクションタイトル編集UI
+        if (this.selectedLayoutType) {
+            this.showSectionTitleEditor(this.selectedLayoutType);
+        }
+
+        // 進捗更新
+        this.updateProgress();
+
+        // LocalStorageにも保存
+        this.saveToLocalStorage();
+    }
+
+    /**
+     * Undoボタンの有効/無効を更新
+     */
+    updateUndoButton() {
+        const undoBtn = document.getElementById('undoBtn');
+        const undoCount = document.getElementById('undoCount');
+
+        if (undoBtn) {
+            if (this.history.length === 0) {
+                undoBtn.disabled = true;
+                undoBtn.style.opacity = '0.5';
+                undoBtn.style.cursor = 'not-allowed';
+            } else {
+                undoBtn.disabled = false;
+                undoBtn.style.opacity = '1';
+                undoBtn.style.cursor = 'pointer';
+            }
+        }
+
+        if (undoCount) {
+            undoCount.textContent = this.history.length > 0 ? `(${this.history.length})` : '';
+        }
     }
 }
 

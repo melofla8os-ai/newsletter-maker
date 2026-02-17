@@ -18,7 +18,12 @@
         <div class="progress-bar-container">
             <div class="progress-header">
                 <span class="progress-label">進捗状況</span>
-                <span class="progress-percentage" id="progressPercentage">0%</span>
+                <div class="progress-actions">
+                    <button id="undoBtn" class="undo-btn" onclick="app.undo()" disabled>
+                        ⏮️ 元に戻す <span id="undoCount"></span>
+                    </button>
+                    <span class="progress-percentage" id="progressPercentage">0%</span>
+                </div>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progressFill"></div>
