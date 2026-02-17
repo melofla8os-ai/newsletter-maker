@@ -1,0 +1,55 @@
+{
+  "name": "newsletter-maker",
+  "version": "1.0.0",
+  "description": "高齢者福祉施設向け新聞自動作成ツール",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/melofla8os-ai/newsletter-maker.git"
+  },
+  "keywords": ["newsletter", "elderly", "welfare", "pdf"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/melofla8os-ai/newsletter-maker/issues"
+  },
+  "homepage": "https://github.com/melofla8os-ai/newsletter-maker#readme",
+  "devDependencies": {
+    "electron": "^40.4.1",
+    "electron-builder": "^26.7.0"
+  },
+  "build": {
+    "appId": "com.newsletter-maker.app",
+    "productName": "新聞作成ツール",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "main.js",
+      "preload.js",
+      "css/**",
+      "js/**",
+      "assets/**"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "language": "1041"
+    }
+  }
+}

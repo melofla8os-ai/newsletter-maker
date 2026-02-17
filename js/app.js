@@ -622,9 +622,26 @@ class NewsletterApp {
             const date = new Date();
             const filename = `${eventTitle}_${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}.pdf`;
 
-            pdf.save(filename);
+            // Electronアプリ: ネイティブ保存ダイアログを使用
+            if (window.electronAPI) {
+                const savePath = await window.electronAPI.showSaveDialog(filename);
+                if (!savePath) return; // キャンセル
 
-            console.log('PDF保存完了');
+                const pdfBase64 = pdf.output('datauristring').split(',')[1];
+                const result = await window.electronAPI.savePdfBuffer(savePath, pdfBase64);
+
+                if (result.success) {
+                    // 保存したファイルをOSで開く
+                    await window.electronAPI.openFile(savePath);
+                    console.log('PDF保存完了 (Electron):', savePath);
+                } else {
+                    throw new Error(result.error);
+                }
+            } else {
+                // ブラウザ: 従来のダウンロード
+                pdf.save(filename);
+                console.log('PDF保存完了 (Browser):', filename);
+            }
         } catch (error) {
             console.error('PDF生成エラー:', error);
             alert('⚠️ PDF生成中にエラーが発生しました！\n\n【対処法】\n✅ ページを再読み込みしてください\n✅ 写真のサイズが大きすぎる場合は枚数を減らしてください\n✅ 別のブラウザ（Chrome推奨）で試してください\n\nエラー詳細: ' + error.message);
