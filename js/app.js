@@ -526,7 +526,7 @@ class NewsletterApp {
 
                     <!-- コメント -->
                     ${comment ? `
-                        <div style="
+                        <div data-role="comment-section" style="
                             padding: 5mm;
                             background: white;
                             border: 2px solid ${template.colors.secondary};
@@ -590,6 +590,10 @@ class NewsletterApp {
                 return;
             }
 
+            // Quick編集ボタンを一時的に非表示（PDF出力に含めないため）
+            const quickEditBtns = wrapper.querySelectorAll('.quick-edit-btn');
+            quickEditBtns.forEach(btn => btn.style.display = 'none');
+
             // zoom を一時的にリセット（原寸でキャンバス化するため）
             const originalZoom = wrapper.style.zoom;
             wrapper.style.zoom = '';
@@ -607,6 +611,9 @@ class NewsletterApp {
 
             // zoom を元に戻す
             wrapper.style.zoom = originalZoom;
+
+            // Quick編集ボタンを再表示
+            quickEditBtns.forEach(btn => btn.style.display = '');
 
             // jsPDFでPDF生成
             const { jsPDF } = window.jspdf;
@@ -878,7 +885,7 @@ class NewsletterApp {
         }
 
         // コメントセクションに編集ボタンを追加
-        const commentSection = wrapper.querySelector('div[style*="line-height: 1.8"]');
+        const commentSection = wrapper.querySelector('div[data-role="comment-section"]');
         if (commentSection && !commentSection.querySelector('.quick-edit-btn')) {
             const editBtn = this.createEditButton('commentText', 'コメントを編集');
             editBtn.style.cssText = `

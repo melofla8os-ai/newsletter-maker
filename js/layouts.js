@@ -110,7 +110,7 @@ function generateCommentSection(comment, template, fontSize = null) {
     fontSize = fontSize || window._customFontSizes?.commentFontSize || 11;
 
     return `
-        <div style="
+        <div data-role="comment-section" style="
             padding: 5mm;
             background: white;
             border: 2px solid ${template.colors.secondary};
