@@ -140,6 +140,9 @@ class NewsletterApp {
             this.eventTitle = this.currentTemplate.defaultEventName;
         }
 
+        // 月変更後も現在のレイアウトに応じてステップ4.5の表示を更新
+        this.showSectionTitleEditor(this.selectedLayoutType);
+
         this.saveToLocalStorage(); // 状態を保存
         console.log(`月選択: ${this.selectedMonth}月 - ${this.currentTemplate.name}`);
     }
