@@ -203,8 +203,12 @@ function generateLargePhoto(photo, template, height = '100mm') {
 
 /**
  * ページラッパーを生成
+ * month が渡された場合は素材ありバージョンを使用
  */
-function generatePageWrapper(content, template) {
+function generatePageWrapper(content, template, month = null) {
+    if (month && typeof generatePageWrapperWithMaterials === 'function') {
+        return generatePageWrapperWithMaterials(content, template, month);
+    }
     return `
         <div class="preview-wrapper">
             <div style="
@@ -273,7 +277,7 @@ function generateGrid5x4Layout(app) {
         ${generateFooter(template)}
     `;
 
-    return generatePageWrapper(content, template);
+    return generatePageWrapper(content, template, app.selectedMonth);
 }
 
 /**
@@ -315,7 +319,7 @@ function generateMagazine2ColLayout(app) {
         ${generateFooter(template)}
     `;
 
-    return generatePageWrapper(content, template);
+    return generatePageWrapper(content, template, app.selectedMonth);
 }
 
 /**
@@ -369,7 +373,7 @@ function generateMagazine3ColLayout(app) {
         ${generateFooter(template)}
     `;
 
-    return generatePageWrapper(content, template);
+    return generatePageWrapper(content, template, app.selectedMonth);
 }
 
 /**
@@ -404,7 +408,7 @@ function generateFeatureSpotlightLayout(app) {
         ${generateFooter(template)}
     `;
 
-    return generatePageWrapper(content, template);
+    return generatePageWrapper(content, template, app.selectedMonth);
 }
 
 /**
@@ -463,5 +467,5 @@ function generateMixedSectionsLayout(app) {
         ${generateFooter(template)}
     `;
 
-    return generatePageWrapper(content, template);
+    return generatePageWrapper(content, template, app.selectedMonth);
 }
