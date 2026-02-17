@@ -130,15 +130,15 @@ function generateCommentSection(comment, template, fontSize = null) {
 /**
  * 写真グリッドを生成
  */
-function generatePhotoGrid(photos, columns, template, gap = '2mm') {
+function generatePhotoGrid(photos, columns, template, gap = '2mm', startIndex = 0) {
     return `
         <div style="
             display: grid;
             grid-template-columns: repeat(${columns}, 1fr);
             gap: ${gap};
         ">
-            ${photos.map(photo => `
-                <div style="
+            ${photos.map((photo, i) => `
+                <div class="preview-photo" data-photo-index="${startIndex + i}" style="
                     aspect-ratio: 1;
                     overflow: hidden;
                     border-radius: 6px;
@@ -153,6 +153,7 @@ function generatePhotoGrid(photos, columns, template, gap = '2mm') {
                         height: 100%;
                         object-fit: cover;
                         object-position: center center;
+                        pointer-events: none;
                     ">
                 </div>
             `).join('')}
@@ -183,9 +184,9 @@ function generateSectionHeader(title, template) {
 /**
  * 単一写真(大きめ)を生成
  */
-function generateLargePhoto(photo, template, height = '100mm') {
+function generateLargePhoto(photo, template, height = '100mm', photoIndex = 0) {
     return `
-        <div style="
+        <div class="preview-photo" data-photo-index="${photoIndex}" style="
             height: ${height};
             overflow: hidden;
             border-radius: 8px;
@@ -201,6 +202,7 @@ function generateLargePhoto(photo, template, height = '100mm') {
                 height: 100%;
                 object-fit: cover;
                 object-position: center center;
+                pointer-events: none;
             ">
         </div>
     `;
@@ -257,8 +259,8 @@ function generateGrid5x4Layout(app) {
             margin-bottom: 5mm;
             flex-shrink: 0;
         ">
-            ${photos.map(photo => `
-                <div style="
+            ${photos.map((photo, index) => `
+                <div class="preview-photo" data-photo-index="${index}" style="
                     aspect-ratio: 1;
                     overflow: hidden;
                     border-radius: 6px;
@@ -273,6 +275,7 @@ function generateGrid5x4Layout(app) {
                         height: 100%;
                         object-fit: cover;
                         object-position: center center;
+                        pointer-events: none;
                     ">
                 </div>
             `).join('')}
@@ -312,11 +315,11 @@ function generateMagazine2ColLayout(app) {
         ">
             <div>
                 ${generateSectionHeader('メイン写真', template)}
-                ${generateLargePhoto(heroPhoto, template, '120mm')}
+                ${generateLargePhoto(heroPhoto, template, '120mm', 0)}
             </div>
             <div>
                 ${generateSectionHeader('活動の様子', template)}
-                ${generatePhotoGrid(gridPhotos, 3, template, '2mm')}
+                ${generatePhotoGrid(gridPhotos, 3, template, '2mm', 1)}
             </div>
         </div>
 
@@ -345,7 +348,7 @@ function generateMagazine3ColLayout(app) {
     const col2 = photos.slice(5, 10);
     const col3 = photos.slice(10, 15);
 
-    const generateColumn = (title, columnPhotos) => {
+    const generateColumn = (title, columnPhotos, startIndex = 0) => {
         if (columnPhotos.length === 0) return '';
         return `
             <div style="
@@ -355,7 +358,7 @@ function generateMagazine3ColLayout(app) {
                 background: white;
             ">
                 ${generateSectionHeader(title, template)}
-                ${generatePhotoGrid(columnPhotos, 2, template, '2mm')}
+                ${generatePhotoGrid(columnPhotos, 2, template, '2mm', startIndex)}
             </div>
         `;
     };
@@ -369,9 +372,9 @@ function generateMagazine3ColLayout(app) {
             gap: 4mm;
             margin-bottom: 5mm;
         ">
-            ${generateColumn(app.sectionTitles['magazine-3col']?.section1 || '活動①', col1)}
-            ${generateColumn(app.sectionTitles['magazine-3col']?.section2 || '活動②', col2)}
-            ${generateColumn(app.sectionTitles['magazine-3col']?.section3 || '活動③', col3)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section1 || '活動①', col1, 0)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section2 || '活動②', col2, 5)}
+            ${generateColumn(app.sectionTitles['magazine-3col']?.section3 || '活動③', col3, 10)}
         </div>
 
         ${generateCommentSection(comment, template)}
@@ -401,12 +404,12 @@ function generateFeatureSpotlightLayout(app) {
         ${generateHeader(eventTitle, eventDate, template)}
 
         <div style="margin-bottom: 4mm;">
-            ${generateLargePhoto(heroPhoto, template, '90mm')}
+            ${generateLargePhoto(heroPhoto, template, '90mm', 0)}
         </div>
 
         ${generateSectionHeader('その他の様子', template)}
         <div style="margin-bottom: 4mm;">
-            ${generatePhotoGrid(gridPhotos, 4, template, '2mm')}
+            ${generatePhotoGrid(gridPhotos, 4, template, '2mm', 1)}
         </div>
 
         ${generateCommentSection(comment, template)}
@@ -449,7 +452,7 @@ function generateMixedSectionsLayout(app) {
 
         <div style="margin-bottom: ${sizing.sectionGap}mm;">
             ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section1 || '午前の部', template)}
-            ${generatePhotoGrid(section1, 3, template, `${sizing.photoGap}mm`)}
+            ${generatePhotoGrid(section1, 3, template, `${sizing.photoGap}mm`, 0)}
         </div>
 
         <div style="
@@ -460,11 +463,11 @@ function generateMixedSectionsLayout(app) {
         ">
             <div>
                 ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section2 || '午後の部', template)}
-                ${generatePhotoGrid(section2, 2, template, `${sizing.photoGap}mm`)}
+                ${generatePhotoGrid(section2, 2, template, `${sizing.photoGap}mm`, 6)}
             </div>
             <div>
                 ${generateSectionHeader(app.sectionTitles['mixed-sections']?.section3 || 'エンディング', template)}
-                ${generatePhotoGrid(section3, 2, template, `${sizing.photoGap}mm`)}
+                ${generatePhotoGrid(section3, 2, template, `${sizing.photoGap}mm`, 12)}
             </div>
         </div>
 

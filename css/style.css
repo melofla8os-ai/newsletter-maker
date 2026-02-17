@@ -757,6 +757,33 @@ footer {
     flex-wrap: wrap;
 }
 
+/* 写真入れ替え機能 */
+.preview-photo {
+    cursor: pointer;
+    transition: outline 0.1s;
+}
+
+.preview-photo:hover {
+    outline: 3px solid rgba(102, 126, 234, 0.7);
+    outline-offset: -2px;
+}
+
+.preview-photo.swap-selected {
+    outline: 4px solid #f5576c !important;
+    outline-offset: -2px;
+}
+
+.swap-hint {
+    margin-bottom: 10px;
+    padding: 8px 15px;
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #1565c0;
+    text-align: center;
+}
+
 /* A4 印刷用スタイル */
 @media print {
     body {
@@ -782,8 +809,9 @@ footer {
         margin: 0;
     }
 
-    /* Quick編集ボタンを印刷時に非表示 */
-    .quick-edit-btn {
+    /* Quick編集ボタン・入れ替えヒントを印刷時に非表示 */
+    .quick-edit-btn,
+    .swap-hint {
         display: none !important;
     }
 

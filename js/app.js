@@ -343,6 +343,8 @@ class NewsletterApp {
             this.checkAndAdjustA4Fit();
             // Quick編集ボタンを追加
             this.addQuickEditButtons();
+            // 写真入れ替えハンドラーを追加
+            this.addPhotoSwapHandlers();
             // 進捗更新
             this.updateProgress();
         }, 500);
@@ -503,8 +505,8 @@ class NewsletterApp {
                         margin-bottom: 5mm;
                         flex-shrink: 0;
                     ">
-                        ${displayPhotos.map(photo => `
-                            <div style="
+                        ${displayPhotos.map((photo, index) => `
+                            <div class="preview-photo" data-photo-index="${index}" style="
                                 aspect-ratio: 1;
                                 overflow: hidden;
                                 border-radius: 6px;
@@ -519,6 +521,7 @@ class NewsletterApp {
                                     height: 100%;
                                     object-fit: cover;
                                     object-position: center center;
+                                    pointer-events: none;
                                 ">
                             </div>
                         `).join('')}
@@ -590,9 +593,11 @@ class NewsletterApp {
                 return;
             }
 
-            // Quick編集ボタンを一時的に非表示（PDF出力に含めないため）
+            // Quick編集ボタン・入れ替えヒントを一時的に非表示（PDF出力に含めないため）
             const quickEditBtns = wrapper.querySelectorAll('.quick-edit-btn');
             quickEditBtns.forEach(btn => btn.style.display = 'none');
+            const swapHint = document.querySelector('.swap-hint');
+            if (swapHint) swapHint.style.display = 'none';
 
             // zoom を一時的にリセット（原寸でキャンバス化するため）
             const originalZoom = wrapper.style.zoom;
@@ -617,8 +622,9 @@ class NewsletterApp {
             wrapper.style.zoom = originalZoom;
             wrapper.style.width = originalWidth;
 
-            // Quick編集ボタンを再表示
+            // Quick編集ボタン・入れ替えヒントを再表示
             quickEditBtns.forEach(btn => btn.style.display = '');
+            if (swapHint) swapHint.style.display = '';
 
             // jsPDFでPDF生成
             const { jsPDF } = window.jspdf;
@@ -957,6 +963,53 @@ class NewsletterApp {
         }
 
         console.log('Quick編集ボタンを追加しました');
+    }
+
+    /**
+     * 写真入れ替えハンドラーをプレビューに追加
+     */
+    addPhotoSwapHandlers() {
+        const previewArea = document.getElementById('previewArea');
+        const wrapper = previewArea.querySelector('.preview-wrapper');
+        if (!wrapper) return;
+
+        // ヒントバナーを表示（既存なら再利用）
+        let hint = previewArea.querySelector('.swap-hint');
+        if (!hint) {
+            hint = document.createElement('div');
+            hint.className = 'swap-hint';
+            hint.textContent = '💡 写真をクリックして選択 → 別の写真をクリックで入れ替え';
+            previewArea.insertBefore(hint, wrapper);
+        }
+
+        let selectedIndex = null;
+
+        // イベント委譲でプレビュー全体を監視
+        wrapper.addEventListener('click', (e) => {
+            const photoDiv = e.target.closest('.preview-photo');
+            if (!photoDiv) return;
+
+            const clickedIndex = parseInt(photoDiv.dataset.photoIndex);
+            if (isNaN(clickedIndex)) return;
+
+            if (selectedIndex === null) {
+                // 1枚目を選択
+                selectedIndex = clickedIndex;
+                photoDiv.classList.add('swap-selected');
+            } else if (selectedIndex === clickedIndex) {
+                // 同じ写真をクリック → 選択解除
+                photoDiv.classList.remove('swap-selected');
+                selectedIndex = null;
+            } else {
+                // 2枚目をクリック → 入れ替え実行
+                [this.photos[selectedIndex], this.photos[clickedIndex]] =
+                    [this.photos[clickedIndex], this.photos[selectedIndex]];
+                selectedIndex = null;
+                this.showPreview(); // 即再描画
+            }
+        });
+
+        console.log('写真入れ替えハンドラーを追加しました');
     }
 
     /**
