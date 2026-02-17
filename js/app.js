@@ -341,11 +341,10 @@ class NewsletterApp {
         // 画像読み込み完了後にA4フィット確認（500ms待機）
         setTimeout(() => {
             this.checkAndAdjustA4Fit();
-            // Quick編集ボタンを追加
+            this.applyDisplayScale();      // プレビュー表示スケール調整
             this.addQuickEditButtons();
-            // 写真入れ替えハンドラーを追加
             this.addPhotoSwapHandlers();
-            // 進捗更新
+            this.addInlineEditHandlers();  // インライン編集
             this.updateProgress();
         }, 500);
 
@@ -1010,6 +1009,76 @@ class NewsletterApp {
         });
 
         console.log('写真入れ替えハンドラーを追加しました');
+    }
+
+    /**
+     * プレビューをコンテナ幅に合わせてスケーリング（表示専用）
+     */
+    applyDisplayScale() {
+        const previewArea = document.getElementById('previewArea');
+        const wrapper = document.querySelector('.preview-wrapper');
+        if (!wrapper) return;
+
+        const a4WidthPx = 794; // 210mm @ 96dpi
+        const availableWidth = previewArea.clientWidth - 40;
+        const scale = Math.min(1.0, availableWidth / a4WidthPx);
+
+        if (scale < 1.0) {
+            wrapper.style.transform = `scale(${scale})`;
+            wrapper.style.transformOrigin = 'top center';
+            // transform は layout に影響しないので、余白を詰める
+            const originalHeight = wrapper.scrollHeight;
+            wrapper.style.marginBottom = `-${Math.round(originalHeight * (1 - scale))}px`;
+        } else {
+            wrapper.style.transform = '';
+            wrapper.style.marginBottom = '';
+        }
+    }
+
+    /**
+     * プレビュー上でタイトル・セクション名をインライン編集
+     */
+    addInlineEditHandlers() {
+        const wrapper = document.querySelector('.preview-wrapper');
+        if (!wrapper) return;
+
+        // タイトル編集
+        const titleEl = wrapper.querySelector('[data-editable="title"]');
+        if (titleEl) {
+            titleEl.setAttribute('contenteditable', 'true');
+            titleEl.addEventListener('blur', () => {
+                // 装飾絵文字を除いたテキストを取得
+                const raw = titleEl.textContent.trim();
+                // 先頭・末尾の絵文字スペースを除去（正規表現で装飾を除いたタイトル部分）
+                // テンプレートの装飾を除いた中心テキストを更新
+                const deco = this.currentTemplate?.decorations?.[0] || '';
+                const cleaned = raw.replace(new RegExp(`^${deco}\\s*`), '').replace(new RegExp(`\\s*${deco}$`), '').trim();
+                if (cleaned) {
+                    this.eventTitle = cleaned;
+                    const input = document.getElementById('eventTitle');
+                    if (input) input.value = cleaned;
+                }
+            });
+        }
+
+        // セクションヘッダー編集
+        const sectionEls = wrapper.querySelectorAll('[data-editable="section"]');
+        sectionEls.forEach(el => {
+            el.addEventListener('blur', () => {
+                const key = el.dataset.sectionKey;
+                const layoutType = this.selectedLayoutType;
+                if (key && this.sectionTitles[layoutType]) {
+                    const newTitle = el.textContent.trim();
+                    this.sectionTitles[layoutType][key] = newTitle;
+                    // 対応する入力フィールドにも反映
+                    const inputEl = document.getElementById(key);
+                    if (inputEl) inputEl.value = newTitle;
+                    this.saveToLocalStorage();
+                }
+            });
+        });
+
+        console.log('インライン編集ハンドラーを追加しました');
     }
 
     /**

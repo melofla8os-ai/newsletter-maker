@@ -400,8 +400,8 @@ main {
     min-height: 200px;
     overflow: auto;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
 }
 
 .preview-area.active {
@@ -411,38 +411,7 @@ main {
 /* プレビューコンテンツラッパー */
 .preview-wrapper {
     transform-origin: top center;
-    transition: transform 0.3s ease;
-}
-
-/* 画面サイズに応じたスケーリング */
-@media (max-width: 1400px) {
-    .preview-wrapper {
-        transform: scale(0.8);
-    }
-}
-
-@media (max-width: 1200px) {
-    .preview-wrapper {
-        transform: scale(0.7);
-    }
-}
-
-@media (max-width: 1000px) {
-    .preview-wrapper {
-        transform: scale(0.6);
-    }
-}
-
-@media (max-width: 800px) {
-    .preview-wrapper {
-        transform: scale(0.5);
-    }
-}
-
-@media (max-width: 600px) {
-    .preview-wrapper {
-        transform: scale(0.4);
-    }
+    transition: transform 0.2s ease;
 }
 
 /* 出力ボタン */
@@ -755,6 +724,22 @@ footer {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
+}
+
+/* プレビュー インライン編集 */
+[data-editable]:hover {
+    outline: 2px dashed rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+    cursor: text;
+}
+
+[data-editable="section"]:hover {
+    outline: 2px dashed rgba(255, 255, 255, 0.9);
+}
+
+[data-editable]:focus {
+    outline: 2px solid #fff176 !important;
+    outline-offset: 2px;
 }
 
 /* 写真入れ替え機能 */
