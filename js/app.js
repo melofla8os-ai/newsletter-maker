@@ -598,6 +598,10 @@ class NewsletterApp {
             const originalZoom = wrapper.style.zoom;
             wrapper.style.zoom = '';
 
+            // A4幅（210mm = 96dpiで794px）を明示的に設定してキャプチャ精度を保証
+            const originalWidth = wrapper.style.width;
+            wrapper.style.width = '794px';
+
             // 少し待ってからキャンバス化（レンダリング完了を待つ）
             await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -606,13 +610,12 @@ class NewsletterApp {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: null,
-                windowWidth: wrapper.scrollWidth,
-                windowHeight: wrapper.scrollHeight
+                backgroundColor: null
             });
 
-            // zoom を元に戻す
+            // zoom・幅を元に戻す
             wrapper.style.zoom = originalZoom;
+            wrapper.style.width = originalWidth;
 
             // Quick編集ボタンを再表示
             quickEditBtns.forEach(btn => btn.style.display = '');
